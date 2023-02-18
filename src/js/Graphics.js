@@ -1,6 +1,6 @@
 class Graphics {
 
-    constructor(canvasContainerId,carImage,levelImage,cameraSpeed = 15) {
+    constructor(canvasContainerId,carImage,levelImage,cameraSpeed = 2) {
         this.c = document.getElementById(canvasContainerId);
         this.ctx = this.c.getContext("2d");
         this.loadCarImage(carImage);
