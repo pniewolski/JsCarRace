@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Polyline Editor</title>
+    <style>
+    .block {
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+    #code {
+    margin-top: 40px;
+    }
+    </style>
+</head>
+
+<body>
+
+    <div class="onTop">
+
+        <div class="block">
+            <input type="file" id="fileInput" accept="image/*">
+            <button id="modePolyline">Brzegi toru</button>
+            <button id="modeRectSlow">Spowalniacz</button>
+            <button id="modeRectSlip">Ślisko</button>
+
+            <button id="startLine">Linia startu</button>
+            <button id="startCarA">Auto A</button>
+            <button id="startCarB">Auto B</button>
+
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="undo">Cofnij</button>
+
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="next">Kontynuuj</button>
+            
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button style="display:none" id="save">Zapisz</button>
+        </div>
+
+    </div>
+    <div style="display:none" id="code">
+      Tło poziomu: <input type="text" id="levelBackground" value="./levels/img/level_1.jpg"/><br>
+      Obrazek samochodu: <input type="text" id="carImage" value="./levels/img/car1.png" /><br>
+      Szerokość samochodu: <input type="text" id="carWidth" value="30" /><br>
+      Długość samochodu: <input type="text" id="carLength" value="50" /><br> 
+      Przyczepność przesuwania: <input type="text" id="gripSlideNormal" value="0.1" /><br>
+      Przyczepność obrotu: <input type="text" id="gripHandlingNormal" value="0.1" /><br>
+      Przyczepność przesuwania z hamulcem ręcznym: <input type="text" id="gripSlideHadbrake" value="0.08" /><br>
+      Przyczepność obrotu z hamulcem ręcznym: <input type="text" id="gripHandlingHandbrake" value="0.08" /><br>
+      Przyczepność przesuwania na śliskim: <input type="text" id="gripSlideIce" value="0.04" /><br>
+      Przyczepność obrotu na śliskim: <input type="text" id="gripHandlingIce" value="0.04" /><br>
+      Moc silnika: <input type="text" id="enginePower" value="0.8" /><br>
+      Moc silnika do tyłu: <input type="text" id="engineReversePower" value="0.6" /><br>
+      Moc hamowania: <input type="text" id="brakePower" value="0.5" /><br>
+      Mnożnik oporu powietrza i kół<input type="text" id="dragMultiply" value="0.01" /><br>
+      Mnożnik oporu powietrza i kół na żwirku<input type="text" id="dragMultiplyOnGravel" value="0.11" /><br>
+      Kąt początkowy pierwszego samochodu<input type="text" id="startPositionAngle" value="90" /> (licząc że godzina 3 to 0 stopni) <br>
+      Kąt początkowy drugiego samochodu<input type="text" id="startPositionSecondPlayerAngle" value="90" /> (licząc że godzina 3 to 0 stopni) <br>
+    </div>
+    <div id="cheatsheet">
+        <img src="cheatsheet.png">
+    </div>
+    <canvas style="background-image:url(level_2.jpg)" id="canvas" width="500" height="500"></canvas>
+
+    <script>
+        var gui = {
+            file: document.getElementById('fileInput'),
+            modePolyline: document.getElementById('modePolyline'),
+            modeRectSlow: document.getElementById('modeRectSlow'),
+            modeRectSlip: document.getElementById('modeRectSlip'),
+            startLine: document.getElementById('startLine'),
+            startCarA: document.getElementById('startCarA'),
+            startCarB: document.getElementById('startCarB'),
+            undo: document.getElementById('undo'),
+            next: document.getElementById('next'),
+            save: document.getElementById('save'),
+            code: document.getElementById('code'),
+            levelBackground: document.getElementById('levelBackground'),
+            carImage: document.getElementById('carImage'),
+            carWidth: document.getElementById('carWidth'),
+            carLength: document.getElementById('carLength'),
+            gripSlideNormal: document.getElementById('gripSlideNormal'),
+            gripHandlingNormal: document.getElementById('gripHandlingNormal'),
+            gripSlideHadbrake: document.getElementById('gripSlideHadbrake'),
+            gripHandlingHandbrake: document.getElementById('gripHandlingHandbrake'),
+            gripSlideIce: document.getElementById('gripSlideIce'),
+            gripHandlingIce: document.getElementById('gripHandlingIce'),
+            enginePower: document.getElementById('enginePower'),
+            engineReversePower: document.getElementById('engineReversePower'),
+            brakePower: document.getElementById('brakePower'),
+            dragMultiply: document.getElementById('dragMultiply'),
+            dragMultiplyOnGravel: document.getElementById('dragMultiplyOnGravel'),
+            startPositionAngle: document.getElementById('startPositionAngle'),
+            startPositionSecondPlayerAngle: document.getElementById('startPositionSecondPlayerAngle'),
+            cheatsheet: document.getElementById('cheatsheet'),
+            
+        }
+        var image = new Image();
+
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        var currentArr = 0;
+        var shifter = 0;
+        var points = [];
+        var rects_a = [];
+        var rects_b = [];
+        var currentArr_a = 0;
+        var currentArr_b = 0;
+        var startCar_a = {};
+        var startCar_b = {};
+        var startLine = [];
+        
+        var result = {};
+
+        var currentMode = "polyline";
+
+
+
+        function resetCanvas() {
+            context = canvas.getContext('2d');
+            canvas.width = image.width;
+            canvas.height = image.height;
+            console.log("draw image");
+            context.drawImage(image, 0, 0);
+            gui.file.style.display = 'none';
+            gui.cheatsheet.style.display = 'none';
+            
+        }
+
+        function clearCanvas() {
+            context.drawImage(image, 0, 0);
+        }
+
+        function modeChanged() {
+            console.log("zmiana trybu");
+            if (currentMode != "polyline") {
+                if (points[currentArr].length > 2) {
+                    currentArr += 1;
+                }
+            }
+        }
+
+        function download(filename, text) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+        
+        function prepareDoublePoint(arr) {
+            let min_x = Math.min(arr[0].x,arr[1].x);
+            let max_x = Math.max(arr[0].x,arr[1].x);
+            let min_y = Math.min(arr[0].y,arr[1].y);
+            let max_y = Math.max(arr[0].y,arr[1].y);
+            return [{x: min_x, y: min_y},{x: max_x, y: max_y}];
+        }
+        
+        function nextScreen() {
+            try {
+          
+            
+            if(image.width == 0) throw "Nie wczytałeś obrazka.";
+            
+            result.properties = {};
+
+                      
+            if (!startCar_a.x) throw "Nie ustaliłeś początkowej pozycji auta 1";
+            if (!startCar_b.x) throw "Nie ustaliłeś początkowej pozycji auta 2";
+            
+            result.properties.levelWidth = image.width;
+            result.properties.levelHeight = image.height;
+              
+            result.track = [];
+            let goodPoints = 0;
+            points.forEach(polyline => {
+                if (polyline.length > 2) {
+                    result.track.push(polyline);
+                    goodPoints += 1;
+                }
+            });
+            
+            if (goodPoints == 0) throw "Nie zdefiniowano żadnych obrysów trasy.";  
+            
+            result.gravel = [];
+            rects_a.forEach(polyline => {
+                if (polyline.length >= 2) {
+                    result.gravel.push(prepareDoublePoint(polyline));
+                }
+            });
+            
+            result.ice = [];
+            rects_b.forEach(polyline => {
+                if (polyline.length >= 2) {
+                    result.ice.push(prepareDoublePoint(polyline));
+                }
+            });
+            
+            if (!startLine[0]) throw "Nie ustaliłeś linii start-meta";
+            
+            result.finishLine = [{x: startLine[0].x, y: startLine[0].y},{x: startLine[1].x, y: startLine[1].y}];
+            
+            canvas.style.display = 'none';
+            gui.code.style.display = '';
+            
+            gui.next.style.display = 'none';
+            gui.save.style.display = '';
+            
+            
+            gui.modePolyline.style.display = 'none';
+            gui.modeRectSlow.style.display = 'none';
+            gui.modeRectSlip.style.display = 'none';
+            gui.startLine.style.display = 'none';
+            gui.startCarA.style.display = 'none';
+            gui.startCarB.style.display = 'none';
+            gui.undo.style.display = 'none';
+            
+            
+            } catch (error) {
+                alert("Nie uzupełniłeś wszystkich potrzebnych rzeczy! Info o błędzie: "+error);
+            }
+        }
+        
+        function finishCreateFile() {
+          try {
+              result.properties.levelBackground = gui.levelBackground.value;
+              result.properties.carImage = gui.carImage.value;
+              result.properties.carWidth = Number(gui.carWidth.value);
+              result.properties.carLength = Number(gui.carLength.value);
+              result.properties.gripSlideNormal = Number(gui.gripSlideNormal.value);
+              result.properties.gripHandlingNormal = Number(gui.gripHandlingNormal.value);
+              result.properties.gripSlideHadbrake = Number(gui.gripSlideHadbrake.value);
+              result.properties.gripHandlingHandbrake = Number(gui.gripHandlingHandbrake.value);
+              result.properties.gripSlideIce = Number(gui.gripSlideIce.value);
+              result.properties.gripHandlingIce = Number(gui.gripHandlingIce.value);
+              result.properties.enginePower = Number(gui.enginePower.value);
+              result.properties.engineReversePower = Number(gui.engineReversePower.value);
+              result.properties.brakePower = Number(gui.brakePower.value);
+              result.properties.dragMultiply = Number(gui.dragMultiply.value);
+              result.properties.dragMultiplyOnGravel = Number(gui.dragMultiplyOnGravel.value);
+              let angle1 = (gui.startPositionAngle.value/180)*Math.PI;
+              let angle2 = (gui.startPositionSecondPlayerAngle.value/180)*Math.PI;
+              result.properties.startPosition = {x: startCar_a.x, y: startCar_a.y, a: angle1};
+              result.properties.startPositionSecondPlayer = {x: startCar_a.x, y: startCar_a.y, a: angle2};
+              
+              
+              let resultJson = JSON.stringify(result);
+              download("level_x.json", resultJson);
+            
+            
+          } catch (error) {
+              alert("Nie uzupełniłeś wszystkich potrzebnych rzeczy! Info o błędzie: "+error);
+          }        
+        }
+
+        function addEventListeners() {
+            gui.file.addEventListener('change', function (e) {
+                var file = e.target.files[0];
+                image.src = URL.createObjectURL(file);
+                image.onload = function () {
+                    console.log("image loaded");
+                    resetCanvas();
+                };
+            });
+
+            gui.modePolyline.addEventListener('click', function (e) {
+                currentMode = "polyline";
+                modeChanged();
+            });
+
+            gui.modeRectSlow.addEventListener('click', function (e) {
+                currentMode = "rectangleSlow";
+                modeChanged();
+            });
+
+            gui.modeRectSlip.addEventListener('click', function (e) {
+                currentMode = "rectangleSlip";
+                modeChanged();
+            });
+
+            gui.startLine.addEventListener('click', function (e) {
+                currentMode = "startLine";
+                modeChanged();
+            });
+
+            gui.startCarA.addEventListener('click', function (e) {
+                currentMode = "startCarA";
+                modeChanged();
+            });
+
+            gui.startCarB.addEventListener('click', function (e) {
+                currentMode = "startCarB";
+                modeChanged();
+            });
+
+            gui.undo.addEventListener('click', function (e) {
+                if (currentMode == "polyline") {
+                    if (points[currentArr].length > 0) {
+                        points[currentArr].pop();
+
+                    }
+                } else if (currentMode == "rectangleSlow") {
+                    rects_a.pop();
+                } else if (currentMode == "rectangleSlip") {
+                    rects_b.pop();
+                }
+                redrawCurrent();
+
+            });
+
+            gui.next.addEventListener('click', function (e) {
+                nextScreen();
+            });
+            
+            gui.save.addEventListener('click', function (e) {
+                finishCreateFile();
+            });
+            
+            
+        }
+
+        addEventListeners();
+
+
+        var snapping = false;
+
+        function snaperWraper(num) {
+            if (snapping) {
+                return Math.round(num / 10) * 10;
+            } else {
+                return num;
+            }
+        }
+
+        function redrawCurrent() {
+
+            clearCanvas();
+
+            for (var xx = 0; xx <= currentArr; xx++) {
+                if (points[xx] && points[xx].length > 1) {
+                    ctx.lineWidth = "2";
+                    ctx.strokeStyle = "black";
+                    ctx.beginPath();
+                    ctx.moveTo(snaperWraper(points[xx][0].x), snaperWraper(points[xx][0].y));
+                    for (var i = 1; i < points[xx].length; i++) {
+                        ctx.lineTo(points[xx][i].x, points[xx][i].y);
+                    }
+                    if (xx < currentArr) ctx.lineTo(points[xx][0].x, points[xx][0].y);
+                    ctx.stroke();
+                }
+            }
+
+            for (var xx = 0; xx < currentArr_a; xx++) {
+
+                if (rects_a[xx] && rects_a[xx].length > 1) {
+                    ctx.lineWidth = "2";
+                    ctx.strokeStyle = "orange";
+                    ctx.beginPath();
+                    let px = snaperWraper(rects_a[xx][0].x);
+                    let py = snaperWraper(rects_a[xx][0].y);
+                    let width = snaperWraper(rects_a[xx][1].x) - px;
+                    let height = snaperWraper(rects_a[xx][1].y) - py;
+                    ctx.rect(px, py, width, height);
+                    ctx.stroke();
+                }
+            }
+
+            for (var xx = 0; xx < currentArr_b; xx++) {
+
+                if (rects_b[xx] && rects_b[xx].length > 1) {
+                    ctx.lineWidth = "2";
+                    ctx.strokeStyle = "blue";
+                    ctx.beginPath();
+                    let px = snaperWraper(rects_b[xx][0].x);
+                    let py = snaperWraper(rects_b[xx][0].y);
+                    let width = snaperWraper(rects_b[xx][1].x) - px;
+                    let height = snaperWraper(rects_b[xx][1].y) - py;
+                    ctx.rect(px, py, width, height);
+                    ctx.stroke();
+                }
+            }
+
+            if (startCar_a.x) {
+                ctx.lineWidth = "2";
+                ctx.strokeStyle = "green";
+                ctx.beginPath();
+                ctx.arc(startCar_a.x, startCar_a.y, 20, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+
+            if (startCar_b.x) {
+                ctx.lineWidth = "2";
+                ctx.strokeStyle = "lime";
+                ctx.beginPath();
+                ctx.arc(startCar_b.x, startCar_b.y, 20, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+
+            if (startLine[0]) {
+                ctx.lineWidth = "2";
+                ctx.strokeStyle = "violet";
+                ctx.beginPath();
+                ctx.moveTo(snaperWraper(startLine[0].x), snaperWraper(startLine[0].y));
+                ctx.lineTo(snaperWraper(startLine[1].x), snaperWraper(startLine[1].y));
+                ctx.stroke();
+            }
+            ctx.lineWidth = "1";
+            ctx.strokeStyle = "black";
+
+        }
+
+        function addCanvasListeners() {
+            canvas.addEventListener("mousedown", function (event) {
+                let mouseX = snaperWraper(event.offsetX + shifter);
+                let mouseY = snaperWraper(event.offsetY + shifter);
+
+                if (currentMode == "polyline") {
+
+
+                    if (!points[currentArr]) points[currentArr] = [];
+
+                    if (points[currentArr][0] && Math.abs(points[currentArr][0].x - mouseX) < 10 && Math.abs(points[currentArr][0].y - mouseY) < 10) {
+                        console.log("close")
+                        if (points[currentArr].length > 2) {
+                            ctx.closePath();
+                            currentArr += 1;
+                        }
+                    } else {
+                        points[currentArr].push({ x: mouseX, y: mouseY });
+                    }
+                } else if (currentMode == "rectangleSlow") {
+
+                    if (!rects_a[currentArr_a]) {
+                        rects_a[currentArr_a] = [];
+                        rects_a[currentArr_a].push({ x: mouseX, y: mouseY });
+
+                        console.log(rects_a);
+                    }
+                } else if (currentMode == "rectangleSlip") {
+
+                    if (!rects_b[currentArr_b]) {
+                        rects_b[currentArr_b] = [];
+                        rects_b[currentArr_b].push({ x: mouseX, y: mouseY });
+
+                        console.log(rects_b);
+                    }
+                } else if (currentMode == "startCarA") {
+                    startCar_a = { x: mouseX, y: mouseY };
+                    redrawCurrent();
+                } else if (currentMode == "startCarB") {
+                    startCar_b = { x: mouseX, y: mouseY };
+                    redrawCurrent();
+                } else if (currentMode == "startLine") {
+                    startLine[0] = { x: mouseX, y: mouseY };
+                    startLine[1] = false;
+                }
+            });
+
+            canvas.addEventListener("mousemove", function (event) {
+                if (currentMode == "polyline") {
+                    if (!points[currentArr]) points[currentArr] = [];
+                    redrawCurrent();
+
+                    if (points[currentArr].length > 0) {
+                        ctx.beginPath();
+                        let last = points[currentArr].length - 1;
+                        ctx.moveTo(snaperWraper(points[currentArr][last].x), snaperWraper(points[currentArr][last].y));
+                        ctx.lineTo(snaperWraper(event.offsetX + shifter), snaperWraper(event.offsetY + shifter));
+                        ctx.stroke();
+                    }
+                } else if (currentMode == "rectangleSlow") {
+                    if (rects_a[currentArr_a].length == 1) {
+                        redrawCurrent();
+                        ctx.beginPath();
+                        let px = snaperWraper(rects_a[currentArr_a][0].x);
+                        let py = snaperWraper(rects_a[currentArr_a][0].y);
+                        let width = snaperWraper(event.offsetX + shifter) - px;
+                        let height = snaperWraper(event.offsetY + shifter) - py;
+                        ctx.rect(px, py, width, height);
+                        ctx.stroke();
+                    }
+                } else if (currentMode == "rectangleSlip") {
+                    if (rects_b[currentArr_b].length == 1) {
+                        redrawCurrent();
+                        ctx.beginPath();
+                        let px = snaperWraper(rects_b[currentArr_b][0].x);
+                        let py = snaperWraper(rects_b[currentArr_b][0].y);
+                        let width = snaperWraper(event.offsetX + shifter) - px;
+                        let height = snaperWraper(event.offsetY + shifter) - py;
+                        ctx.rect(px, py, width, height);
+                        ctx.stroke();
+                    }
+                } else if (currentMode == "startLine") {
+                    if (!startLine[1]) {
+                        redrawCurrent();
+                        ctx.beginPath();
+                        ctx.moveTo(snaperWraper(startLine[0].x), snaperWraper(startLine[0].y));
+                        ctx.lineTo(snaperWraper(event.offsetX + shifter), snaperWraper(event.offsetY + shifter));
+                        ctx.stroke();
+                    }
+                }
+            });
+
+
+            canvas.addEventListener("mouseup", function (event) {
+                let mouseX = snaperWraper(event.offsetX + shifter);
+                let mouseY = snaperWraper(event.offsetY + shifter);
+                if (currentMode == "rectangleSlow") {
+                    rects_a[currentArr_a].push({ x: mouseX, y: mouseY });
+                    currentArr_a += 1;
+                    redrawCurrent();
+                } else if (currentMode == "rectangleSlip") {
+                    rects_b[currentArr_b].push({ x: mouseX, y: mouseY });
+                    currentArr_b += 1;
+                    redrawCurrent();
+                } else if (currentMode == "startLine") {
+                    startLine[1] = { x: mouseX, y: mouseY };
+                    redrawCurrent();
+                }
+            });
+
+        }
+
+        addCanvasListeners();
+
+
+
+    </script>
+</body>
+
+</html>

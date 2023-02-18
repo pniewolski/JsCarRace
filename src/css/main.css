@@ -1,0 +1,121 @@
+body {
+    font-family:Arial,Verdana;
+    margin: 0;
+}
+
+.gameLink {
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid #e5e5e5;
+}
+
+.gameLink input {
+    font-size: 12px;
+    width: 100%;
+    font-weight: bold;
+}
+
+.gameBox {
+    font-family:Arial,Verdana;
+    width:800px;
+    margin:0;
+    padding:0;
+    background: #243240;
+}
+
+.networkInfo {
+    width:100%;
+    padding: 5px;
+    color:white;
+    background-color: #1d232a;
+    box-sizing: border-box;
+}
+
+
+.hud {
+    width:100%;
+    padding: 0;
+    color:black;
+    background-color: #7e8184;
+    box-sizing: border-box;  
+}
+
+.hudItem {
+    width:120px;
+    padding:5px;
+    box-sizing: border-box;  
+    border-width: 0 1px 0 0;
+    border-color: #243240;
+    border-style: solid;
+    display:inline-block;
+}
+
+.hudItem .name {
+    font-size: 11px;
+    color:#243240;
+    margin: 0 0 5px 0;
+}
+
+.hudItem .value {
+    font-size: 16px;
+    color:#0d446c;
+    font-weight: bold;
+}
+
+.every-button {
+    padding: 8px;
+    border-width: 2px;
+    border-color: black;
+    border-style: solid;
+    border-radius: 5px;
+    margin: 3px;
+}
+
+.primary-button {
+    font-size: 20px;
+    background-color: #5dcd65;
+    padding: 8px;
+}
+
+.secondary-button {
+    font-size: 12px;
+    background-color: #ef8e81;
+}
+
+.buttonsGroup {
+    display: inline-block;
+    width:350px;
+    padding: 10px;
+    margin: 5px;
+    border-color: #254f79;
+    border-style: dotted;
+    border-width: 1px;
+    border-radius: 4px;
+    vertical-align: top;
+}
+
+.baseGroup {
+    display: block;
+    padding: 10px;
+    margin: 5px;
+    border-color: #254f79;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 4px;
+    width: 800px;
+}
+
+.buttonsGroup .info, .baseGroup .info {
+    display:block;
+    font-size: 11px;
+    font-style: italic;
+    margin-top: 14px;
+    color: #454f5b;
+}
+
+.footerCars {
+    font-size: 12px;
+    font-style: italic;
+    color: #254f79;
+    padding: 10px;
+}

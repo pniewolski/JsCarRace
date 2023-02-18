@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>CAARRRZ</title>
+	<link rel="stylesheet" href="src/css/main.css">
+	<link rel="stylesheet" href="https://aplikacje.top/css/header.css">
+	<script type="module" src="dist/carsim.bundle.js"></script>
+
+</head>
+
+<body>
+
+
+
+	<div class="appHeader">
+		<a href="https://aplikacje.top/">
+			<img src="https://aplikacje.top/img/logo.png">
+		</a>
+		<div class="appNameContainer">
+			<div class="appName">
+				Wyścigi samochodowe
+			</div>
+
+			<div class="appDesc">
+				Gra dla jednego lub dwóch graczy przez sieć
+			</div>
+		</div>
+	</div>
+
+
+
+	<div id="interfaceContainer">
+
+		<div id="gameLevelSection" class="baseGroup">
+			wybierz tor:
+			<select id="gameLevel">
+				<option value="./levels/level1.json">Stary tor</option>
+				<option value="./levels/level_1.json">Tor wyścigowy wąski</option>
+				<option value="./levels/level_2.json">Tor asfalt - gravel</option>
+				<option value="./levels/level_3.json">TEST</option>
+			</select>
+			<span id="circuitChooseInfo" class="info">Tu możesz wybrać gdzie chcesz się ścigać.</span>
+		</div>
+		<div class="buttonsGroup">
+			<button class="every-button" id="connect">Gra sieciowa</button>
+			<div class="gameLink" id="gameLink"></div>
+			<button class="every-button" id="connectWithRandom">Znajdź obcego przeciwnika</button>
+			<span id="gameInfoLink" class="info">Opcja gry sieciowej pozwala zagrać ze znajomym. Lub nieznajomym.</span>
+		</div>
+
+		<div class="buttonsGroup">
+			<button class="every-button" id="single">Graj sam</button>
+			<span class="info">Wybierz tą opcję jeżeli chcesz poćwiczyć samemu. Twoje najlepsze okrążenie będzie
+				nałożone w postaci "ducha".</span>
+		</div>
+	</div>
+	<div id="multiplayerRandomInfo" class="baseGroup">
+		Trwa oczekiwanie na przeciwnika z internetu. W tej chwili nie ma nikogo kto czeka na grę na tym torze, ale jeśli
+		taka osoba się pojawi to natychmiast rozpoczniesz z nią grę. Cierpliwości i nie zamykaj tego okna.
+	</div>
+	<div id="gameplayContainer" class="gameBox">
+		<div id="networkInfoText" class="networkInfo">Witaj!</div>
+		<canvas id="gameCanvas" width="800" height="600"></canvas>
+		<div class="hud">
+			<div class="hudItem">
+				<div class="name">Prędkość</div>
+				<div id="hud_speed" class="value">0</div>
+			</div>
+			<div class="hudItem">
+				<div class="name">Okrążenie</div>
+				<div id="hud_lap" class="value">0</div>
+			</div>
+			<div class="hudItem">
+				<div class="name">Czas</div>
+				<div id="hud_time" class="value">0</div>
+			</div>
+			<div class="hudItem">
+				<div class="name">Ostatnie okrążenie</div>
+				<div id="hud_currLap" class="value">-</div>
+			</div>
+			<div class="hudItem">
+				<div class="name">Najlepsze okrążenie</div>
+				<div id="hud_bestLap" class="value">-</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="footerCars">
+		<span>Strona jest częścią projektu <a href="https://aplikacje.top">aplikacje.top</a>. Niekomercyjnego i
+			hobbystycznego pomysłu polegającego na tworzeniu aplikacji o charakterze edukacyjnym oraz użytkowym.
+			Nieodłączną częścią projektu jest <a href="https://www.youtube.com/mazaq86">mój kanał na Youtube</a>, gdzie
+			tłumaczę wiele zagadnień z zakresu programowania, ale również techniki i fizyki. <br>Strona jest darmowa i
+			bez reklam więc możesz to docenić robiąc mi przelew <a href="https://paypal.me/mazaq1">przez
+				PayPal</a>.</span>
+	</div>
+</body>
+
+</html>
