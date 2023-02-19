@@ -205,9 +205,7 @@ class Geometry {
     }
 
     static addAngleVectorToPoint(p, v) {
-        console.log("angle"+(v.a/Math.PI)*180);
         let v2 = this.angleVectorToPointVector(v); 
-        console.log("shift",v2);
         return { x: p.x + v2.dx, y: p.y + v2.dy };
     }
 

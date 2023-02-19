@@ -16,8 +16,10 @@ class Simulation {
         this.net_meReady = false;
         this.net_remoteReady = false;
 
-        this.fps = 45;
+        this.fps = 40;
         this.interval = Math.ceil(1000 / this.fps);
+        this.startDelay = this.fps * 4;
+        this.waitingForStart = true;
         this.counter = 0;
 
         this.lap = 0;
@@ -95,6 +97,9 @@ class Simulation {
     }
 
     async setSim(level = null, network = false) {
+
+        this.waitingForStart = true;
+
         if (!level) {
             level = this.interface.getSelectedLevel();
         }
@@ -200,6 +205,10 @@ class Simulation {
     }
 
     simTick(self) {
+        if (self.waitingForStart && self.counter > self.startDelay) {
+            self.waitingForStart = false;
+        }
+
         if (self.isNetworkGame && (self.counter - self.multiplayer.remoteCar.n) > 5) {
             return;
         }
@@ -208,9 +217,9 @@ class Simulation {
             self.collisionShift = null;
         }
         self.graphics.clearBoard();
-        self.physics.tick(self.level);
-
-
+        if (!self.waitingForStart) {
+            self.physics.tick(self.level);
+        } 
         self.checkLapTime();
 
         self.graphics.setCamera(self.car);
@@ -221,6 +230,9 @@ class Simulation {
             self.graphics.paintCar(self.multiplayer.remoteCar, self.car, true);
         } else {
             self.graphics.paintCar(self.handleGhost({ x: self.car.x, y: self.car.y, a: self.car.a, b: self.car.b }), self.car, true);
+        }
+        if (self.waitingForStart) {
+            self.graphics.paintCountdown(Math.ceil(self.counter/self.fps));
         }
         self.handleTime();
         self.graphics.restoreCamera();

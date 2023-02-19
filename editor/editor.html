@@ -4,14 +4,15 @@
 <head>
     <title>Polyline Editor</title>
     <style>
-    .block {
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
-    #code {
-    margin-top: 40px;
-    }
+        .block {
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        #code {
+            margin-top: 40px;
+        }
     </style>
 </head>
 
@@ -32,29 +33,31 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="undo">Cofnij</button>
 
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="next">Kontynuuj</button>
-            
+
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button style="display:none" id="save">Zapisz</button>
         </div>
 
     </div>
     <div style="display:none" id="code">
-      Tło poziomu: <input type="text" id="levelBackground" value="./levels/img/level_1.jpg"/><br>
-      Obrazek samochodu: <input type="text" id="carImage" value="./levels/img/car1.png" /><br>
-      Szerokość samochodu: <input type="text" id="carWidth" value="30" /><br>
-      Długość samochodu: <input type="text" id="carLength" value="50" /><br> 
-      Przyczepność przesuwania: <input type="text" id="gripSlideNormal" value="0.1" /><br>
-      Przyczepność obrotu: <input type="text" id="gripHandlingNormal" value="0.1" /><br>
-      Przyczepność przesuwania z hamulcem ręcznym: <input type="text" id="gripSlideHadbrake" value="0.08" /><br>
-      Przyczepność obrotu z hamulcem ręcznym: <input type="text" id="gripHandlingHandbrake" value="0.08" /><br>
-      Przyczepność przesuwania na śliskim: <input type="text" id="gripSlideIce" value="0.04" /><br>
-      Przyczepność obrotu na śliskim: <input type="text" id="gripHandlingIce" value="0.04" /><br>
-      Moc silnika: <input type="text" id="enginePower" value="0.8" /><br>
-      Moc silnika do tyłu: <input type="text" id="engineReversePower" value="0.6" /><br>
-      Moc hamowania: <input type="text" id="brakePower" value="0.5" /><br>
-      Mnożnik oporu powietrza i kół<input type="text" id="dragMultiply" value="0.01" /><br>
-      Mnożnik oporu powietrza i kół na żwirku<input type="text" id="dragMultiplyOnGravel" value="0.11" /><br>
-      Kąt początkowy pierwszego samochodu<input type="text" id="startPositionAngle" value="90" /> (licząc że godzina 3 to 0 stopni) <br>
-      Kąt początkowy drugiego samochodu<input type="text" id="startPositionSecondPlayerAngle" value="90" /> (licząc że godzina 3 to 0 stopni) <br>
+        Tło poziomu: <input type="text" id="levelBackground" value="./levels/img/level_1.jpg" /><br>
+        Obrazek samochodu: <input type="text" id="carImage" value="./levels/img/car1.png" /><br>
+        Szerokość samochodu: <input type="text" id="carWidth" value="30" /><br>
+        Długość samochodu: <input type="text" id="carLength" value="50" /><br>
+        Przyczepność przesuwania: <input type="text" id="gripSlideNormal" value="0.1" /><br>
+        Przyczepność obrotu: <input type="text" id="gripHandlingNormal" value="0.1" /><br>
+        Przyczepność przesuwania z hamulcem ręcznym: <input type="text" id="gripSlideHadbrake" value="0.08" /><br>
+        Przyczepność obrotu z hamulcem ręcznym: <input type="text" id="gripHandlingHandbrake" value="0.08" /><br>
+        Przyczepność przesuwania na śliskim: <input type="text" id="gripSlideIce" value="0.04" /><br>
+        Przyczepność obrotu na śliskim: <input type="text" id="gripHandlingIce" value="0.04" /><br>
+        Moc silnika: <input type="text" id="enginePower" value="0.8" /><br>
+        Moc silnika do tyłu: <input type="text" id="engineReversePower" value="0.6" /><br>
+        Moc hamowania: <input type="text" id="brakePower" value="0.5" /><br>
+        Mnożnik oporu powietrza i kół<input type="text" id="dragMultiply" value="0.01" /><br>
+        Mnożnik oporu powietrza i kół na żwirku<input type="text" id="dragMultiplyOnGravel" value="0.11" /><br>
+        Kąt początkowy pierwszego samochodu<input type="text" id="startPositionAngle" value="90" /> (licząc że godzina 3
+        to 0 stopni) <br>
+        Kąt początkowy drugiego samochodu<input type="text" id="startPositionSecondPlayerAngle" value="90" /> (licząc że
+        godzina 3 to 0 stopni) <br>
     </div>
     <div id="cheatsheet">
         <img src="cheatsheet.png">
@@ -92,7 +95,7 @@
             startPositionAngle: document.getElementById('startPositionAngle'),
             startPositionSecondPlayerAngle: document.getElementById('startPositionSecondPlayerAngle'),
             cheatsheet: document.getElementById('cheatsheet'),
-            
+
         }
         var image = new Image();
 
@@ -108,7 +111,7 @@
         var startCar_a = {};
         var startCar_b = {};
         var startLine = [];
-        
+
         var result = {};
 
         var currentMode = "polyline";
@@ -123,7 +126,7 @@
             context.drawImage(image, 0, 0);
             gui.file.style.display = 'none';
             gui.cheatsheet.style.display = 'none';
-            
+
         }
 
         function clearCanvas() {
@@ -151,110 +154,110 @@
 
             document.body.removeChild(element);
         }
-        
+
         function prepareDoublePoint(arr) {
-            let min_x = Math.min(arr[0].x,arr[1].x);
-            let max_x = Math.max(arr[0].x,arr[1].x);
-            let min_y = Math.min(arr[0].y,arr[1].y);
-            let max_y = Math.max(arr[0].y,arr[1].y);
-            return [{x: min_x, y: min_y},{x: max_x, y: max_y}];
+            let min_x = Math.min(arr[0].x, arr[1].x);
+            let max_x = Math.max(arr[0].x, arr[1].x);
+            let min_y = Math.min(arr[0].y, arr[1].y);
+            let max_y = Math.max(arr[0].y, arr[1].y);
+            return [{ x: min_x, y: min_y }, { x: max_x, y: max_y }];
         }
-        
+
         function nextScreen() {
             try {
-          
-            
-            if(image.width == 0) throw "Nie wczytałeś obrazka.";
-            
-            result.properties = {};
 
-                      
-            if (!startCar_a.x) throw "Nie ustaliłeś początkowej pozycji auta 1";
-            if (!startCar_b.x) throw "Nie ustaliłeś początkowej pozycji auta 2";
-            
-            result.properties.levelWidth = image.width;
-            result.properties.levelHeight = image.height;
-              
-            result.track = [];
-            let goodPoints = 0;
-            points.forEach(polyline => {
-                if (polyline.length > 2) {
-                    result.track.push(polyline);
-                    goodPoints += 1;
-                }
-            });
-            
-            if (goodPoints == 0) throw "Nie zdefiniowano żadnych obrysów trasy.";  
-            
-            result.gravel = [];
-            rects_a.forEach(polyline => {
-                if (polyline.length >= 2) {
-                    result.gravel.push(prepareDoublePoint(polyline));
-                }
-            });
-            
-            result.ice = [];
-            rects_b.forEach(polyline => {
-                if (polyline.length >= 2) {
-                    result.ice.push(prepareDoublePoint(polyline));
-                }
-            });
-            
-            if (!startLine[0]) throw "Nie ustaliłeś linii start-meta";
-            
-            result.finishLine = [{x: startLine[0].x, y: startLine[0].y},{x: startLine[1].x, y: startLine[1].y}];
-            
-            canvas.style.display = 'none';
-            gui.code.style.display = '';
-            
-            gui.next.style.display = 'none';
-            gui.save.style.display = '';
-            
-            
-            gui.modePolyline.style.display = 'none';
-            gui.modeRectSlow.style.display = 'none';
-            gui.modeRectSlip.style.display = 'none';
-            gui.startLine.style.display = 'none';
-            gui.startCarA.style.display = 'none';
-            gui.startCarB.style.display = 'none';
-            gui.undo.style.display = 'none';
-            
-            
+
+                if (image.width == 0) throw "Nie wczytałeś obrazka.";
+
+                result.properties = {};
+
+
+                if (!startCar_a.x) throw "Nie ustaliłeś początkowej pozycji auta 1";
+                if (!startCar_b.x) throw "Nie ustaliłeś początkowej pozycji auta 2";
+
+                result.properties.levelWidth = image.width;
+                result.properties.levelHeight = image.height;
+
+                result.track = [];
+                let goodPoints = 0;
+                points.forEach(polyline => {
+                    if (polyline.length > 2) {
+                        result.track.push(polyline);
+                        goodPoints += 1;
+                    }
+                });
+
+                if (goodPoints == 0) throw "Nie zdefiniowano żadnych obrysów trasy.";
+
+                result.gravel = [];
+                rects_a.forEach(polyline => {
+                    if (polyline.length >= 2) {
+                        result.gravel.push(prepareDoublePoint(polyline));
+                    }
+                });
+
+                result.ice = [];
+                rects_b.forEach(polyline => {
+                    if (polyline.length >= 2) {
+                        result.ice.push(prepareDoublePoint(polyline));
+                    }
+                });
+
+                if (!startLine[0]) throw "Nie ustaliłeś linii start-meta";
+
+                result.finishLine = [{ x: startLine[0].x, y: startLine[0].y }, { x: startLine[1].x, y: startLine[1].y }];
+
+                canvas.style.display = 'none';
+                gui.code.style.display = '';
+
+                gui.next.style.display = 'none';
+                gui.save.style.display = '';
+
+
+                gui.modePolyline.style.display = 'none';
+                gui.modeRectSlow.style.display = 'none';
+                gui.modeRectSlip.style.display = 'none';
+                gui.startLine.style.display = 'none';
+                gui.startCarA.style.display = 'none';
+                gui.startCarB.style.display = 'none';
+                gui.undo.style.display = 'none';
+
+
             } catch (error) {
-                alert("Nie uzupełniłeś wszystkich potrzebnych rzeczy! Info o błędzie: "+error);
+                alert("Nie uzupełniłeś wszystkich potrzebnych rzeczy! Info o błędzie: " + error);
             }
         }
-        
+
         function finishCreateFile() {
-          try {
-              result.properties.levelBackground = gui.levelBackground.value;
-              result.properties.carImage = gui.carImage.value;
-              result.properties.carWidth = Number(gui.carWidth.value);
-              result.properties.carLength = Number(gui.carLength.value);
-              result.properties.gripSlideNormal = Number(gui.gripSlideNormal.value);
-              result.properties.gripHandlingNormal = Number(gui.gripHandlingNormal.value);
-              result.properties.gripSlideHadbrake = Number(gui.gripSlideHadbrake.value);
-              result.properties.gripHandlingHandbrake = Number(gui.gripHandlingHandbrake.value);
-              result.properties.gripSlideIce = Number(gui.gripSlideIce.value);
-              result.properties.gripHandlingIce = Number(gui.gripHandlingIce.value);
-              result.properties.enginePower = Number(gui.enginePower.value);
-              result.properties.engineReversePower = Number(gui.engineReversePower.value);
-              result.properties.brakePower = Number(gui.brakePower.value);
-              result.properties.dragMultiply = Number(gui.dragMultiply.value);
-              result.properties.dragMultiplyOnGravel = Number(gui.dragMultiplyOnGravel.value);
-              let angle1 = (gui.startPositionAngle.value/180)*Math.PI;
-              let angle2 = (gui.startPositionSecondPlayerAngle.value/180)*Math.PI;
-              result.properties.startPosition = {x: startCar_a.x, y: startCar_a.y, a: angle1};
-              result.properties.startPositionSecondPlayer = {x: startCar_a.x, y: startCar_a.y, a: angle2};
-              
-              
-              let resultJson = JSON.stringify(result);
-              download("level_x.json", resultJson);
-            
-            
-          } catch (error) {
-              alert("Nie uzupełniłeś wszystkich potrzebnych rzeczy! Info o błędzie: "+error);
-          }        
+            try {
+                result.properties.levelBackground = gui.levelBackground.value;
+                result.properties.carImage = gui.carImage.value;
+                result.properties.carWidth = Number(gui.carWidth.value);
+                result.properties.carLength = Number(gui.carLength.value);
+                result.properties.gripSlideNormal = Number(gui.gripSlideNormal.value);
+                result.properties.gripHandlingNormal = Number(gui.gripHandlingNormal.value);
+                result.properties.gripSlideHadbrake = Number(gui.gripSlideHadbrake.value);
+                result.properties.gripHandlingHandbrake = Number(gui.gripHandlingHandbrake.value);
+                result.properties.gripSlideIce = Number(gui.gripSlideIce.value);
+                result.properties.gripHandlingIce = Number(gui.gripHandlingIce.value);
+                result.properties.enginePower = Number(gui.enginePower.value);
+                result.properties.engineReversePower = Number(gui.engineReversePower.value);
+                result.properties.brakePower = Number(gui.brakePower.value);
+                result.properties.dragMultiply = Number(gui.dragMultiply.value);
+                result.properties.dragMultiplyOnGravel = Number(gui.dragMultiplyOnGravel.value);
+                let angle1 = (gui.startPositionAngle.value / 180) * Math.PI;
+                let angle2 = (gui.startPositionSecondPlayerAngle.value / 180) * Math.PI;
+                result.properties.startPosition = { x: startCar_a.x, y: startCar_a.y, a: angle1 };
+                result.properties.startPositionSecondPlayer = { x: startCar_a.x, y: startCar_a.y, a: angle2 };
+
+
+                let resultJson = JSON.stringify(result);
+                download("level_x.json", resultJson);
+
+
+            } catch (error) {
+                alert("Nie uzupełniłeś wszystkich potrzebnych rzeczy! Info o błędzie: " + error);
+            }
         }
 
         function addEventListeners() {
@@ -315,12 +318,12 @@
             gui.next.addEventListener('click', function (e) {
                 nextScreen();
             });
-            
+
             gui.save.addEventListener('click', function (e) {
                 finishCreateFile();
             });
-            
-            
+
+
         }
 
         addEventListeners();
