@@ -14,18 +14,23 @@ class Keyboard {
     keysDown(e) {
         switch (e.keyCode) {
             case 38:
+                e.preventDefault();
                 this.keysPressed.up = true;
                 break;
             case 40:
+                e.preventDefault();
                 this.keysPressed.down = true;
                 break;
             case 37:
+                e.preventDefault();
                 this.keysPressed.left = true;
                 break;
             case 39:
+                e.preventDefault();
                 this.keysPressed.right = true;
                 break;
             case 32:
+                e.preventDefault();
                 this.keysPressed.handbrake = true;
                 break;
         }

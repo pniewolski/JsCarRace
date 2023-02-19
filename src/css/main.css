@@ -20,7 +20,7 @@ body {
     width:800px;
     margin:0;
     padding:0;
-    background: #243240;
+    background: #dadde1;
 }
 
 .networkInfo {
@@ -118,4 +118,10 @@ body {
     font-style: italic;
     color: #254f79;
     padding: 10px;
+}
+
+#gameplayContainer canvas {
+    min-height: 400px;
+    height: calc(100vh - 200px);
+
 }
