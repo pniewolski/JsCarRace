@@ -6,6 +6,7 @@ import Level from "./Level.js";
 import Multiplayer from "./Multiplayer.js";
 import HTMLInterface from "./HTMLInterface.js";
 import GameFinder from "./GameFinder.js";
+import Geometry from "./Geometry.js";
 
 
 class Simulation {
@@ -40,7 +41,7 @@ class Simulation {
             case "multirandom":
                 this.startMultiplayerRandomGame();
                 break;
-                
+
         }
 
     }
@@ -51,14 +52,14 @@ class Simulation {
         this.multiplayer = new Multiplayer(this);
         this.multiplayer.initialize(clientId);
     }
-    
+
     async startMultiplayerRandomGame() {
         this.gameFinder = new GameFinder(this.interface.getSelectedLevel());
         let foundGuid = await this.gameFinder.getGame();
         this.multiplayer = new Multiplayer(this);
-        console.log("found guid: "+foundGuid);
+        console.log("found guid: " + foundGuid);
         if (foundGuid == "nogame") {
-            this.multiplayer.initialize(false,this.gameFinder);
+            this.multiplayer.initialize(false, this.gameFinder);
         } else {
             this.multiplayer.initialize(foundGuid);
         }
@@ -219,7 +220,7 @@ class Simulation {
         self.graphics.clearBoard();
         if (!self.waitingForStart) {
             self.physics.tick(self.level);
-        } 
+        }
         self.checkLapTime();
 
         self.graphics.setCamera(self.car);
@@ -227,12 +228,17 @@ class Simulation {
         self.graphics.paintCar(self.car, self.car);
         if (self.isNetworkGame) {
             self.multiplayer.sendCarData({ x: self.car.x, y: self.car.y, a: self.car.a, b: self.car.b, n: self.counter });
-            self.graphics.paintCar(self.multiplayer.remoteCar, self.car, true);
+            self.graphics.paintCar(self.multiplayer.remoteCar, self.car, 0.6);
         } else {
-            self.graphics.paintCar(self.handleGhost({ x: self.car.x, y: self.car.y, a: self.car.a, b: self.car.b }), self.car, true);
+            let ghost = self.handleGhost({ x: self.car.x, y: self.car.y, a: self.car.a, b: self.car.b })
+            let ghostDist = Geometry.distanceTwoPoints(self.car, ghost);
+            let alphaVal = ghostDist / 200 - 0.3;
+            if (alphaVal < 0.1) alphaVal = 0.1;
+            if (alphaVal > 0.6) alphaVal = 0.6;
+            self.graphics.paintCar(ghost, self.car, alphaVal);
         }
         if (self.waitingForStart) {
-            self.graphics.paintCountdown(Math.ceil(self.counter/self.fps));
+            self.graphics.paintCountdown(Math.ceil(self.counter / self.fps));
         }
         self.handleTime();
         self.graphics.restoreCamera();

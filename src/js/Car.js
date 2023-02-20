@@ -1,5 +1,5 @@
 class Car {
-    constructor(length, width, x=0, y=0, a=0) {
+    constructor(length, width, x = 0, y = 0, a = 0) {
         this.x = x;
         this.y = y;
         this.a = a;
@@ -16,7 +16,7 @@ class Car {
     }
 
     getPos() {
-        return {x:this.x, y:this.y, a: this.a};
+        return { x: this.x, y: this.y, a: this.a };
     }
 
 }

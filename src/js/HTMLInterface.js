@@ -7,11 +7,11 @@ class HTMLInterface {
         this.gameplayContainer = document.getElementById("gameplayContainer");
         this.interfaceContainer = document.getElementById("interfaceContainer");
         this.gameInfoLink = document.getElementById("gameInfoLink");
-        this.connectWithRandom = document.getElementById("connectWithRandom"); 
+        this.connectWithRandom = document.getElementById("connectWithRandom");
         this.gameLevelSection = document.getElementById("gameLevelSection");
-        this.gameLevel = document.getElementById("gameLevel"); 
-        this.multiplayerRandomInfo = document.getElementById("multiplayerRandomInfo"); 
-        this.circuitChooseInfo = document.getElementById("circuitChooseInfo"); 
+        this.gameLevel = document.getElementById("gameLevel");
+        this.multiplayerRandomInfo = document.getElementById("multiplayerRandomInfo");
+        this.circuitChooseInfo = document.getElementById("circuitChooseInfo");
 
         this.simulation = simulation;
 

@@ -70,18 +70,14 @@ class Graphics {
         this.levelImage.src = levelBackground;
     }
 
-    paintCar(car, carProto, ghost = false) {
+    paintCar(car, carProto, alphaLevel = 1.0) {
         this.ctx.translate(car.x, car.y);
         this.ctx.rotate(car.a);
+        this.ctx.globalAlpha = alphaLevel;
         this.drawLineByAngle({ x: carProto.length * 0.8, y: carProto.width * 0.36 }, car.b, carProto.length * 0.1, "black", carProto.width / 7, true);
         this.drawLineByAngle({ x: carProto.length * 0.8, y: carProto.width * -0.36 }, car.b, carProto.length * 0.1, "black", carProto.width / 7, true);
-        if (ghost) {
-            this.ctx.globalAlpha = 0.4;
-        }
         if (this.carImage) this.ctx.drawImage(this.carImage, 0, -carProto.width / 2, carProto.length, carProto.width);
-        if (ghost) {
-            this.ctx.globalAlpha = 1.0;
-        }
+        this.ctx.globalAlpha = 1.0;
         this.ctx.rotate(-car.a);
         this.ctx.translate(-car.x, -car.y);
     }

@@ -205,7 +205,7 @@ class Geometry {
     }
 
     static addAngleVectorToPoint(p, v) {
-        let v2 = this.angleVectorToPointVector(v); 
+        let v2 = this.angleVectorToPointVector(v);
         return { x: p.x + v2.dx, y: p.y + v2.dy };
     }
 
